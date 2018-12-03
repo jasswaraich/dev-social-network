@@ -1,5 +1,6 @@
 const express = require('express'); // we require express
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 
 // Specifying the api routes 
 const users = require('./routes/api/users');
@@ -8,6 +9,9 @@ const posts = require('./routes/api/posts');
 
 const app = express(); // variable for express
 
+// Body parser middleware, Body Parser for the req.body.email and others 
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 
 // DB Config
