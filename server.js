@@ -1,6 +1,7 @@
 const express = require("express"); // we require express
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const passport = require("passport"); // Main authentication module
 
 // Specifying the api routes
 const users = require("./routes/api/users");
@@ -22,6 +23,12 @@ mongoose
   .connect(db)
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
+
+// Passport middleware
+app.use(passport.initialize());
+
+// Passport Config (Using JWT Startegy)
+require("./config/passport")(passport);
 
 app.get("/", (req, res) =>
   res.send("Hey Ya! The Server Is Running Like A Charm.")

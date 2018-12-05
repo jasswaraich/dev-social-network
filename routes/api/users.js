@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const gravatar = require("gravatar"); // Gravatar for the avatar's
 const bcrypt = require("bcryptjs"); // for password hashing/encryption
+const jwt = require("jsonwebtoken");
+const keys = require("../../config/keys");
+const passport = require("passport");
 
 // Load User Model
 const User = require("../../models/User");
@@ -68,12 +71,43 @@ router.post("/login", (req, res) => {
     // Check password
     bcrypt.compare(password, user.password).then(isMatch => {
       if (isMatch) {
-        res.json({ msg: "Sucess" });
+        // User Matched
+
+        const payload = { id: user.id, name: user.name, avatar: user.avatar }; // Create JWT Payload
+
+        // Sign Token (can also check the documentation of JWT)
+        jwt.sign(
+          payload,
+          keys.secretOrKey,
+          { expiresIn: 3600 },
+          (err, token) => {
+            res.json({
+              success: true,
+              token: "Bearer " + token // Bearer - A special type of protocol
+            });
+          }
+        );
       } else {
         return res.status(400).json({ password: "Password incorrect" });
       }
     });
   });
 });
+
+// @route  GET api/users/current
+// @desc   Return current user whosoever the token belongs to
+// @acess  Private
+router.get(
+  "/current",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    //res.json(req.user); - in case we want to return the user
+    res.json({
+      id: req.user.id,
+      name: req.user.name,
+      email: req.user.email
+    });
+  }
+);
 
 module.exports = router; // for server.js to pick it up
