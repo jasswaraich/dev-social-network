@@ -110,4 +110,4 @@ router.get(
   }
 );
 
-module.exports = router; // for server.js to pick it up
+module.exports = router; // for server.js to detect it
